@@ -1,58 +1,40 @@
 use std::collections::HashMap;
-use super::Handler;
+use std::any::Any;
 
-pub struct EventHolder<H, S, E>
-    where H: Handler<S, E> + Sized,
-          E: Sized
-{
-    _e: Option<(S, E)>,
-    counter: usize,
-    pub handlers: HashMap<usize, H>,
+pub trait Raiser {
+    type Type: Sized;
+    fn on_event(&mut self, &mut Self::Type);
+    fn as_any(&mut self) -> &mut Any;
 }
 
-impl<H, S, E> EventHolder<H, S, E>
-    where H: Handler<S, E> + Sized + 'static,
-          E: Sized
-{
-    pub fn new() -> EventHolder<H, S, E> {
-        EventHolder {
-            _e: None,
+pub struct Holder<T> {
+    counter: usize,
+    pub handlers: HashMap<usize, Box<Raiser<Type = T>>>,
+}
+
+impl<T: Send + 'static> Holder<T> {
+    pub fn new() -> Holder<T> {
+        Holder {
             counter: 0,
             handlers: HashMap::new(),
         }
     }
-    pub fn join(&mut self, f: H) -> usize {
+
+    pub fn join<L>(&mut self, r: L) -> usize
+        where L: Raiser<Type = T> + 'static
+    {
         self.counter += 1;
-        self.handlers.insert(self.counter, f);
+        self.handlers.insert(self.counter, Box::new(r));
         return self.counter;
     }
 
-    pub fn leave(&mut self, id: usize) -> Option<H> {
+    pub fn leave(&mut self, id: usize) -> Option<Box<Raiser<Type = T>>> {
         self.handlers.remove(&id)
     }
 
-    pub fn invoke(&mut self, mut sender: &mut S, mut arg: &mut E) {
+    pub fn invoke(&mut self, mut arg: T) {
         for (_, h) in self.handlers.iter_mut() {
-            h.on_event(&mut sender, &mut arg);
-        }
-    }
-}
-
-impl<H, S, E> EventHolder<H, S, E>
-    where H: Handler<S, E> + Sized + Clone + Sync + Send + 'static,
-          S: Clone + Sized + Sync + Send + 'static,
-          E: Clone + Sized + Sync + Send + 'static
-{
-    pub fn invoke_multithreading(&self, sender: &mut S, arg: &mut E) {
-        use std::thread::Builder;
-        for (_, h) in self.handlers.iter() {
-            let mut sc = sender.clone();
-            let mut hc = h.clone();
-            let mut ac = arg.clone();
-            Builder::new()
-                .name("EventHolder Multithread".to_string())
-                .spawn(move || hc.on_event(&mut sc, &mut ac))
-                .unwrap();
+            h.on_event(&mut arg);
         }
     }
 }
