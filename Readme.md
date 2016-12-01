@@ -1,4 +1,4 @@
-# Event and Multithreading Event crate for Rust
+# Event crate for Rust
 ## Example
 ```rust
 #[test]
