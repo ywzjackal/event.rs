@@ -1,8 +1,6 @@
 #![allow(dead_code)]
-mod evt_handler;
-mod evt_holder;
+mod event;
 
-pub use evt_handler::*;
-pub use evt_holder::*;
+pub use event::*;
 
 mod test;
