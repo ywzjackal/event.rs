@@ -25,7 +25,7 @@ impl<T: Send + 'static> Holder<T> {
         self.handlers.remove(&id)
     }
 
-    pub fn invoke(&mut self, mut arg: T) {
+    pub fn invoke(&mut self, mut arg: &mut T) {
         for (_, h) in self.handlers.iter_mut() {
             (*h)(&mut arg);
         }

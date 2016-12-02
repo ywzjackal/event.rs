@@ -19,9 +19,9 @@ fn test_event() {
         *handler2_cc.lock().unwrap() += 1;
     });
 
-    holder.invoke("Hello Handler1 and Handler2!".to_string());
+    holder.invoke(&mut "Hello Handler1 and Handler2!".to_string());
     holder.leave(handler1);
-    holder.invoke("Hello Handler2!".to_string());
+    holder.invoke(&mut "Hello Handler2!".to_string());
 
     assert_eq!(*handler1_counter.lock().unwrap(), 1);
     assert_eq!(*handler2_counter.lock().unwrap(), 2);
