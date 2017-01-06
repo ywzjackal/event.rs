@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-pub struct Holder<T> {
+pub struct HolderMut<T> {
     counter: usize,
     pub handlers: HashMap<usize, Box<Fn(&mut T)>>,
 }
 
-impl<T: Send + 'static> Holder<T> {
-    pub fn new() -> Holder<T> {
-        Holder {
+impl<T: 'static> HolderMut<T> {
+    pub fn new() -> HolderMut<T> {
+        HolderMut {
             counter: 0,
             handlers: HashMap::new(),
         }
