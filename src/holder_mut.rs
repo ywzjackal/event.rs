@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 pub struct HolderMut<T> {
     counter: usize,
-    pub handlers: HashMap<usize, Box<Fn(&mut T) + Send>>,
+    pub handlers: HashMap<usize, Box<Fn(&mut T)>>,
 }
 
 impl<T: 'static> HolderMut<T> {
@@ -14,14 +14,14 @@ impl<T: 'static> HolderMut<T> {
     }
 
     pub fn join<F>(&mut self, r: F) -> usize
-        where F: Fn(&mut T) + Send + 'static
+        where F: Fn(&mut T) + 'static
     {
         self.counter += 1;
         self.handlers.insert(self.counter, Box::new(r));
         return self.counter;
     }
 
-    pub fn leave(&mut self, id: usize) -> Option<Box<Fn(&mut T) + Send>> {
+    pub fn leave(&mut self, id: usize) -> Option<Box<Fn(&mut T)>> {
         self.handlers.remove(&id)
     }
 

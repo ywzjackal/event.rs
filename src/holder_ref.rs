@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 pub struct HolderRef<T> {
     counter: usize,
-    pub handlers: HashMap<usize, Box<Fn(&T) + Send>>,
+    pub handlers: HashMap<usize, Box<Fn(&T)>>,
 }
 
 impl<T: 'static> HolderRef<T> {
@@ -14,14 +14,14 @@ impl<T: 'static> HolderRef<T> {
     }
 
     pub fn join<F>(&mut self, r: F) -> usize
-        where F: Fn(&T) + Send + 'static
+        where F: Fn(&T) + 'static
     {
         self.counter += 1;
         self.handlers.insert(self.counter, Box::new(r));
         return self.counter;
     }
 
-    pub fn leave(&mut self, id: usize) -> Option<Box<Fn(&T) + Send>> {
+    pub fn leave(&mut self, id: usize) -> Option<Box<Fn(&T)>> {
         self.handlers.remove(&id)
     }
 
