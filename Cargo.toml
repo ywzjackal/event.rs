@@ -1,6 +1,6 @@
 [package]
 name = "event"
-version = "0.1.6"
+version = "0.1.5"
 authors = ["Jackal <ywzjackal@163.com>"]
 
 [dependencies]
