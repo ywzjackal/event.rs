@@ -14,7 +14,7 @@ impl<T: 'static> HolderMut<T> {
     }
 
     pub fn join<F>(&mut self, r: F) -> usize
-        where F: Fn(&mut T) + Send + 'static
+        where F: FnMut(&mut T) + Send + 'static
     {
         self.counter += 1;
         self.handlers.insert(self.counter, Box::new(r));

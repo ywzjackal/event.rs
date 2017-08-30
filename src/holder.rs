@@ -14,7 +14,7 @@ impl<T: Clone + 'static> Holder<T> {
     }
 
     pub fn join<F>(&mut self, r: F) -> usize
-        where F: Fn(T) + Send + 'static
+        where F: FnMut(T) + Send + 'static
     {
         self.counter += 1;
         self.handlers.insert(self.counter, Box::new(r));
